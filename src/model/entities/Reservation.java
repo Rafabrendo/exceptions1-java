@@ -46,9 +46,18 @@ public class Reservation {
 		//vai converter o diff que estava em miliseconds para days	
 	}
 	
-	public void updateDates(Date CheckIn, Date CheckOut) {
+	public String updateDates(Date CheckIn, Date CheckOut) {
+		Date now = new Date();//Cria um horario de agr
+		if (checkIn.before(now) || checkOut.before(now)) {
+			 return "Reservation dates for update must be future dates";
+		}
+		if (!checkOut.after(checkIn)){
+			return "Check-out date must be after check-in date";
+		}
 		this.checkIn = CheckIn;
 		this.checkOut = CheckOut;
+		return null; //Se retornar null é porque não deu nenhum erro. Se retornar algum String que não seja 
+		//null, é porque teve algum erro
 	}
 	
 	@Override

@@ -24,6 +24,8 @@ public class Program {
 		Date checkOut = sdf.parse(sc.next());
 		
 		//se não!(inverte) (checkout dps de checkin)
+		//Essa validação tinha que estar no construtor, mas não tem como o construtor retornar uma string
+		//Para ser delegada
 		if (!checkOut.after(checkIn)) {
 			System.out.println("Error in reservation: Check-out date must be after check-in date");
 		}
@@ -38,27 +40,22 @@ public class Program {
 			System.out.print("Check-out date(dd/MM/yyyy): ");
 			checkOut = sdf.parse(sc.next());
 			
-			//Lógica ruim:
-			Date now = new Date();//Cria um horario de agr
-			if (checkIn.before(now) || checkOut.before(now)) {
-				System.out.println("Error in reservation dates for update must be future dates");
-			}
-			else if (!checkOut.after(checkIn)){
-				System.out.println("Error in reservation dates for update must be future dates");
+			//Lógica ruim: Isso é um problema de delegação. Quem deve ser responsavel por saber a reserva
+			//é a reserva, e não outra classe.(tbm é ruim, mas melhor que a atual).
+		
+			String error = reservation.updateDates(checkIn, checkOut);
+			if (error != null) {
+				//Significa que veio alguma String contendo erro
+				System.out.println("Error in reservation: "+ error);
 			}
 			else {
-				reservation.updateDates(checkIn, checkOut);
 				System.out.println("Reservation: "+reservation);
 			}
-			
-			
+		
+
 		}
 		
-		
-		
-		
-		
+	
 		sc.close();
 	}
-
 }
