@@ -6,31 +6,26 @@ import java.util.Date;
 import java.util.Scanner;
 
 import model.entities.Reservation;
+import model.exceptions.DomainException;
 
 public class Program {
 
-	public static void main(String[] args) throws ParseException {
-		//throws ParseException, quando eu acrescento essa declaração eu propago essa exception
-		//Estou falando que meu metodo main não deve tratar esse tipo de exceção, se ocorrer
-		
+	public static void main(String[] args)  {
+
 		Scanner sc = new Scanner(System.in);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		
-		System.out.print("Room number: ");
-		int number = sc.nextInt();
-		System.out.print("Check-in date(dd/MM/yyyy): ");
-		Date checkIn = sdf.parse(sc.next());
-		System.out.print("Check-out date(dd/MM/yyyy): ");
-		Date checkOut = sdf.parse(sc.next());
-		
-		//se não!(inverte) (checkout dps de checkin)
-		//Essa validação tinha que estar no construtor, mas não tem como o construtor retornar uma string
-		//Para ser delegada
-		if (!checkOut.after(checkIn)) {
-			System.out.println("Error in reservation: Check-out date must be after check-in date");
-		}
-		else {
+		try {
+			System.out.print("Room number: ");
+			int number = sc.nextInt();
+			System.out.print("Check-in date(dd/MM/yyyy): ");
+			Date checkIn = sdf.parse(sc.next());
+			System.out.print("Check-out date(dd/MM/yyyy): ");
+			Date checkOut = sdf.parse(sc.next());
+			
+			
 			Reservation reservation = new Reservation(number, checkIn, checkOut);
+			
 			System.out.println("Reservation: "+reservation);
 			
 			System.out.println();
@@ -39,23 +34,23 @@ public class Program {
 			checkIn = sdf.parse(sc.next());
 			System.out.print("Check-out date(dd/MM/yyyy): ");
 			checkOut = sdf.parse(sc.next());
-			
-			//Lógica ruim: Isso é um problema de delegação. Quem deve ser responsavel por saber a reserva
-			//é a reserva, e não outra classe.(tbm é ruim, mas melhor que a atual).
-		
-			String error = reservation.updateDates(checkIn, checkOut);
-			if (error != null) {
-				//Significa que veio alguma String contendo erro
-				System.out.println("Error in reservation: "+ error);
-			}
-			else {
-				System.out.println("Reservation: "+reservation);
-			}
-		
-
-		}
-		
 	
+			reservation.updateDates(checkIn, checkOut); //Não vai me retornar uma string com uma msg de
+			//erro, vai lançar uma exceção caso ela ocorra.
+			System.out.println("Reservation: "+reservation);
+		}
+		catch(ParseException e) {
+			System.out.println("Invalid date format");
+		}
+		catch(DomainException e) {
+			//vou manter esse catch, mesmo sendo uma RuntimeException, para não deixar o programa quebrar
+			System.out.println("Error in reservation: "+ e.getMessage());
+		}
+		//Para que meu programa não quebre com uma possivel, outra, RuntimeException, eu posso fazer outro catch
+		catch(RuntimeException e) {
+			System.out.println("Unexpected error");
+		}
+
 		sc.close();
 	}
 }
